@@ -1,0 +1,26 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: do-monitor-operator
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: do-monitor-operator
+  template:
+    metadata:
+      labels:
+        app: do-monitor-operator
+    spec:
+      serviceAccountName: do-monitor-operator
+      containers:
+        - name: operator
+          image: ghcr.io/douz/do-uptime-kubernetes-operator:latest
+          env:
+            - name: DIGITALOCEAN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: do-token-secret
+                  key: token

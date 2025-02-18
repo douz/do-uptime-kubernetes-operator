@@ -1,0 +1,77 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: domonitor.douz.com
+spec:
+  group: douz.com
+  scope: Namespaced
+  names:
+    plural: domonitor
+    singular: domonitors
+    kind: DoMonitor
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                ingressName:
+                  type: string
+                  description: "The name of the associated Ingress"
+                namespace:
+                  type: string
+                  description: "The namespace where the Ingress exists"
+                monitorID:
+                  type: string
+                  description: "The DigitalOcean Uptime monitor ID"
+                host:
+                  type: string
+                  description: "The monitored hostname"
+                alerts:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      description: "The email address to send alerts to"
+                    slack:
+                      type: object
+                      description: "The Slack webhook to send alerts to"
+                      properties:
+                        url:
+                          type: string
+                          description: "The Slack webhook URL"
+                        channel:
+                          type: string
+                          description: "The Slack channel to send alerts to"
+                    uptimeAlertID:
+                      type: string
+                      description: "The DigitalOcean alert ID"
+                    latency:
+                      type: object
+                      description: "The latency threshold settings"
+                      properties:
+                        alertID:
+                          type: string
+                          description: "The DigitalOcean latency alert ID"
+                        threshold:
+                          type: integer
+                          description: "The latency threshold in milliseconds"
+                        period:
+                          type: string
+                          description: "The period of time to check the latency"
+                    sslExpiry:
+                      type: object
+                      description: "The SSL certificate expiry settings"
+                      properties:
+                        alertID:
+                          type: string
+                          description: "The DigitalOcean SSL expiry alert ID"
+                        threshold:
+                          type: integer
+                          description: "The SSL certificate expiry threshold in days"
