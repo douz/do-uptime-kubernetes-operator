@@ -2,23 +2,17 @@
 apiVersion: douz.com/v1
 kind: DoMonitor
 metadata:
-  name: ingress-test-wordpress-domonitor
+  name: ingress-test-default-domonitor
   namespace: default
 spec:
   ingressName: ingress-test
-  namespace: default
-  monitorID: "123-abc-456-xzy"
   host: "example.com"
-  alerts:
+  config:
     email: "test@example.com"
-    slack:
-      url: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
-      channel: "#alerts"
-    uptimeAlertID: "uptime-123-abc-456-xzy"
-    latency:
-      alertID: "latency-123-abc-456-xzy"
-      threshold: 500
-      period: "2m"
-    sslExpiry:
-      alertID: "ssl-123-abc-456-xzy"
-      threshold: 14
+    emailAlert: true
+    slackWebhook: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+    slackChannel: "#alerts"
+    slackAlert: true
+    latencyThreshold: 500
+    latencyPeriod: "2m"
+    sslExpiryThreshold: 14

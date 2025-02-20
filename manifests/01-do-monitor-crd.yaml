@@ -24,9 +24,6 @@ spec:
                 ingressName:
                   type: string
                   description: "The name of the associated Ingress"
-                namespace:
-                  type: string
-                  description: "The namespace where the Ingress exists"
                 monitorID:
                   type: string
                   description: "The DigitalOcean Uptime monitor ID"
@@ -36,42 +33,39 @@ spec:
                 alerts:
                   type: object
                   properties:
+                    uptimeAlertID:
+                      type: string
+                      description: "The DigitalOcean Uptime alert ID"
+                    latencyAlertID:
+                      type: string
+                      description: "The DigitalOcean latency alert ID"
+                    sslExpiryAlertID:
+                      type: string
+                      description: "The DigitalOcean SSL expiry alert ID"
+                config:
+                  type: object
+                  properties:
                     email:
                       type: string
                       description: "The email address to send alerts to"
-                    slack:
-                      type: object
-                      description: "The Slack webhook to send alerts to"
-                      properties:
-                        url:
-                          type: string
-                          description: "The Slack webhook URL"
-                        channel:
-                          type: string
-                          description: "The Slack channel to send alerts to"
-                    uptimeAlertID:
+                    emailAlert:
+                      type: boolean
+                      description: "Whether to send email alerts"
+                    slackWebhook:
                       type: string
-                      description: "The DigitalOcean alert ID"
-                    latency:
-                      type: object
-                      description: "The latency threshold settings"
-                      properties:
-                        alertID:
-                          type: string
-                          description: "The DigitalOcean latency alert ID"
-                        threshold:
-                          type: integer
-                          description: "The latency threshold in milliseconds"
-                        period:
-                          type: string
-                          description: "The period of time to check the latency"
-                    sslExpiry:
-                      type: object
-                      description: "The SSL certificate expiry settings"
-                      properties:
-                        alertID:
-                          type: string
-                          description: "The DigitalOcean SSL expiry alert ID"
-                        threshold:
-                          type: integer
-                          description: "The SSL certificate expiry threshold in days"
+                      description: "The Slack webhook URL"
+                    slackChannel:
+                      type: string
+                      description: "The Slack channel to send alerts to"
+                    slackAlert:
+                      type: boolean
+                      description: "Whether to send Slack alerts"
+                    latencyThreshold:
+                      type: integer
+                      description: "The latency threshold in milliseconds"
+                    latencyPeriod:
+                      type: string
+                      description: "The period in minutes to check latency"
+                    sslExpiryPeriod:
+                      type: integer
+                      description: "The period in days to check SSL expiry"

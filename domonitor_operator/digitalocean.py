@@ -6,7 +6,10 @@ from pydo import Client
 DO_API_TOKEN = os.environ.get("DIGITALOCEAN_TOKEN").strip()
 client = Client(token=DO_API_TOKEN)
 
-# Helper function to create Uptime Monitor payload
+# ------------------------------------------------------------------------------
+# Helper functions: Create Uptime Monitor payload and Alert payload
+# ------------------------------------------------------------------------------
+# Create Uptime Monitor payload
 def create_monitor_payload(url: str, monitor_name: str) -> dict:
     """Create Uptime Monitor Payload"""
 
@@ -20,7 +23,7 @@ def create_monitor_payload(url: str, monitor_name: str) -> dict:
 
     return payload
 
-# Helper function to create alert payload
+# Create alert payload
 def create_alert_payload(alert_type: str, monitor_id: str, email_alert: bool, slack_alert: bool,
                          email: str, slack_webhook: str, slack_channel: str, **kwargs) -> dict:
     """Create alert payload for a DigitalOcean Uptime Monitor"""
@@ -45,7 +48,11 @@ def create_alert_payload(alert_type: str, monitor_id: str, email_alert: bool, sl
     payload.update(kwargs)
     return payload
 
-# Function to create a new DigitalOcean Uptime Monitor
+# ------------------------------------------------------------------------------
+# DigitalOcean Uptime Monitor and Alerts handlers - Functions to create, update
+# and delete Uptime Monitors and Alerts
+# ------------------------------------------------------------------------------
+# Create a new DigitalOcean Uptime Monitor
 def create_do_monitor(url: str, monitor_name: str) -> str:
     """Create a New DigitalOcean Uptime Monitor"""
 
@@ -60,7 +67,7 @@ def create_do_monitor(url: str, monitor_name: str) -> str:
         logging.error(f"Failed to create DO Uptime Monitor: {monitor_name} ({url}) - {e}")
         return None
 
-# Function to update an existing DigitalOcean Uptime Monitor   
+# Update an existing DigitalOcean Uptime Monitor   
 def update_do_monitor(url: str, monitor_name: str, monitor_id: str):
     """Update an Existing DigitalOcean Uptime Monitor"""
     
@@ -72,7 +79,7 @@ def update_do_monitor(url: str, monitor_name: str, monitor_id: str):
     except Exception as e:
         logging.error(f"Failed to update DO Uptime Monitor: {url} - {e}")
 
-# Function to delete an existing DigitalOcean Uptime Monitor
+# Delete an existing DigitalOcean Uptime Monitor
 def delete_do_monitor(monitor_id: str):
     """Delete an Existing DigitalOcean Uptime Monitor"""
 
@@ -82,12 +89,21 @@ def delete_do_monitor(monitor_id: str):
     except Exception as e:
         logging.error(f"Failed to delete DO Uptime Monitor ID: {monitor_id} - {e}")
 
-# Function to create uptime alert for a DigitalOcean Uptime Monitor
+# Create uptime alert for a DigitalOcean Uptime Monitor
 def create_do_uptime_alert(monitor_id: str, email_alert: bool = False, slack_alert: bool = False,
                            email: str = None, slack_webhook: str = None, slack_channel: str = None) -> str:
     """Create Uptime Alert for a DigitalOcean Uptime Monitor"""
 
-    payload = create_alert_payload("down", monitor_id, email_alert, slack_alert, email, slack_webhook, slack_channel, period="2m")
+    payload = create_alert_payload(
+        "down",
+        monitor_id,
+        email_alert,
+        slack_alert,
+        email,
+        slack_webhook,
+        slack_channel,
+        period="2m"
+    )
 
     try:
         alert = client.uptime.create_alert(check_id=monitor_id, body=payload)
@@ -97,12 +113,21 @@ def create_do_uptime_alert(monitor_id: str, email_alert: bool = False, slack_ale
         logging.error(f"Failed to create DO Uptime Alert for Monitor ID: {monitor_id} - {e}")
         return None
 
-# Function to update an existing uptime alert for a DigitalOcean Uptime Monitor
+# Update an existing uptime alert for a DigitalOcean Uptime Monitor
 def update_do_uptime_alert(monitor_id: str, alert_id: str, email_alert: bool = False, slack_alert: bool = False,
                            email: str = None, slack_webhook: str = None, slack_channel: str = None):
     """Update Uptime Alert for a DigitalOcean Uptime Monitor"""
 
-    payload = create_alert_payload("down", monitor_id, email_alert, slack_alert, email, slack_webhook, slack_channel, period="2m")
+    payload = create_alert_payload(
+        "down",
+        monitor_id,
+        email_alert,
+        slack_alert,
+        email,
+        slack_webhook,
+        slack_channel,
+        period="2m"
+    )
 
     try:
         client.uptime.update_alert(check_id=monitor_id, alert_id=alert_id, body=payload)
@@ -110,14 +135,23 @@ def update_do_uptime_alert(monitor_id: str, alert_id: str, email_alert: bool = F
     except Exception as e:
         logging.error(f"Failed to update DO Uptime Alert for Monitor ID: {monitor_id} - {e}")
 
-# Function to create a latency alert for a DigitalOcean Uptime Monitor
+# Create a latency alert for a DigitalOcean Uptime Monitor
 def create_do_latency_alert(monitor_id: str, email_alert: bool = False, slack_alert: bool = False,
                             email: str = None, slack_webhook: str = None, slack_channel: str = None,
                             latency_threshold: int = 0, latency_period: str = "2m") -> str:
     """Create Latency Alert for a DigitalOcean Uptime Monitor"""
 
-    payload = create_alert_payload("latency", monitor_id, email_alert, slack_alert, email, slack_webhook, slack_channel,
-                                   threshold=latency_threshold, comparison="greater_than", period=latency_period)
+    payload = create_alert_payload(
+        "latency",
+        monitor_id,
+        email_alert,
+        slack_alert,
+        email, slack_webhook,
+        slack_channel,
+        threshold=latency_threshold,
+        comparison="greater_than",
+        period=latency_period
+    )
 
     try:
         alert = client.uptime.create_alert(check_id=monitor_id, body=payload)
@@ -127,14 +161,24 @@ def create_do_latency_alert(monitor_id: str, email_alert: bool = False, slack_al
         logging.error(f"Failed to create DO Latency Alert for Monitor ID: {monitor_id} - {e}")
         return None
     
-# Function to update an existing latency alert for a DigitalOcean Uptime Monitor
+# Update an existing latency alert for a DigitalOcean Uptime Monitor
 def update_do_latency_alert(monitor_id: str, alert_id: str, email_alert: bool = False, slack_alert: bool = False,
                             email: str = None, slack_webhook: str = None, slack_channel: str = None,
                             latency_threshold: int = 0, latency_period: str = "2m"):
     """Update Latency Alert for a DigitalOcean Uptime Monitor"""
 
-    payload = create_alert_payload("latency", monitor_id, email_alert, slack_alert, email, slack_webhook, slack_channel,
-                                   threshold=latency_threshold, comparison="greater_than", period=latency_period)
+    payload = create_alert_payload(
+        "latency",
+        monitor_id,
+        email_alert,
+        slack_alert,
+        email,
+        slack_webhook,
+        slack_channel,
+        threshold=latency_threshold,
+        comparison="greater_than",
+        period=latency_period
+    )
 
     try:
         client.uptime.update_alert(check_id=monitor_id, alert_id=alert_id, body=payload)
@@ -142,14 +186,24 @@ def update_do_latency_alert(monitor_id: str, alert_id: str, email_alert: bool = 
     except Exception as e:
         logging.error(f"Failed to update DO Latency Alert for Monitor ID: {monitor_id} - {e}")
 
-# Function to create an SSL expiration alert for a DigitalOcean Uptime Monitor
+# Create an SSL expiration alert for a DigitalOcean Uptime Monitor
 def create_do_ssl_alert(monitor_id: str, email_alert: bool = False, slack_alert: bool = False,
                         email: str = None, slack_webhook: str = None, slack_channel: str = None,
                         days_left: int = 30) -> str:
     """Create SSL Expiration Alert for a DigitalOcean Uptime Monitor"""
 
-    payload = create_alert_payload("ssl_expiry", monitor_id, email_alert, slack_alert, email, slack_webhook, slack_channel,
-                                   threshold=days_left, comparison="less_than", period="2m")
+    payload = create_alert_payload(
+        "ssl_expiry",
+        monitor_id,
+        email_alert,
+        slack_alert,
+        email,
+        slack_webhook,
+        slack_channel,
+        threshold=days_left,
+        comparison="less_than",
+        period="2m"
+    )
 
     try:
         alert = client.uptime.create_alert(check_id=monitor_id, body=payload)
@@ -159,14 +213,24 @@ def create_do_ssl_alert(monitor_id: str, email_alert: bool = False, slack_alert:
         logging.error(f"Failed to create DO SSL Expiration Alert for Monitor ID: {monitor_id} - {e}")
         return None
     
-# Function to update an existing SSL expiration alert for a DigitalOcean Uptime Monitor
+# Update an existing SSL expiration alert for a DigitalOcean Uptime Monitor
 def update_do_ssl_alert(monitor_id: str, alert_id: str, email_alert: bool = False, slack_alert: bool = False,
                         email: str = None, slack_webhook: str = None, slack_channel: str = None,
                         days_left: int = 30):
     """Update SSL Expiration Alert for a DigitalOcean Uptime Monitor"""
 
-    payload = create_alert_payload("ssl_expiry", monitor_id, email_alert, slack_alert, email, slack_webhook, slack_channel,
-                                   threshold=days_left, comparison="less_than", period="2m")
+    payload = create_alert_payload(
+        "ssl_expiry",
+        monitor_id,
+        email_alert,
+        slack_alert,
+        email,
+        slack_webhook,
+        slack_channel,
+        threshold=days_left,
+        comparison="less_than",
+        period="2m"
+    )
 
     try:
         client.uptime.update_alert(check_id=monitor_id, alert_id=alert_id, body=payload)

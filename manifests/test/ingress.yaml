@@ -5,7 +5,7 @@ metadata:
     # Enable DigitalOcean Monitoring, setting this to true will create a `down` alert
     douz.com/do-monitor: "true"
     # At least one alerting channel must be defined
-    douz.com/do-monitor-email: test@example.com" # Email must be verified in DigitalOcean
+    douz.com/do-monitor-email: "test@example.com" # Email must be verified in DigitalOcean
     douz.com/do-monitor-slack-webhook: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX # Slack webhook
     douz.com/do-monitor-slack-channel: "#alerts" # Slack channel
     douz.com/do-monitor-latency-threshold: "500" # (optional) latency threshold in milliseconds, this will create a `latency` alert

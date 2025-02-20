@@ -1,6 +1,6 @@
 # DigitalOcean Uptime Monitor Operator
 
-This Kubernetes operator automates the creation, update, and deletion of [DigitalOcean Uptime Monitors](https://docs.digitalocean.com/products/monitoring/) and related alerts based on Ingress annotations.
+This Kubernetes Operator automates the creation, update, and deletion of [DigitalOcean Uptime Monitors](https://docs.digitalocean.com/products/monitoring/) and related alerts based on Ingress annotations. The Operator creates a Custom Resource of kind `DoMonitor`, which is the single source of truth and is in charge of creating DigitalOcean resources (monitors and alerts).
 
 ## Installation
 
@@ -21,6 +21,14 @@ This Kubernetes operator automates the creation, update, and deletion of [Digita
    kubectl apply -f manifests/04-operator-deployment.yaml
    ```
 
+### Operator Logs
+
+If you need to troubleshoot or verify that the operator is running correctly, you can view its logs:
+
+```bash
+kubectl logs -f deployment/do-monitor-operator -f -n kube-system
+```
+
 ## Usage
 
 The `do-monitor-operator` will watch for Ingress resources with the `douz.com/do-monitor: "true"` annotation and create the Uptime Monitor and associated alerts accordingly. For example:
@@ -34,7 +42,7 @@ metadata:
   annotations:
     douz.com/do-monitor: "true"
     douz.com/do-monitor-email: "your-email@example.com"
-    douz.com/do-monitor-slack-webhook: "https://hooks.slack.com/services/your/slack/webhook"
+    douz.com/do-monitor-slack-webhook: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
     douz.com/do-monitor-slack-channel: "#your-slack-channel"
     douz.com/do-monitor-latency-threshold: "200"
     douz.com/do-monitor-latency-period: "2m"
@@ -53,11 +61,34 @@ spec:
                   number: 80
 ```
 
-In this example, an Uptime Monitor (check) named `example-ingress-default-domonitor` (`<ingressName>-<namespace>-domonitor`) will be created, along with `down`, `latency`, and `sslExpiry` alerts, sending notifications to the specified email address and Slack channel.
+In this example, an Uptime Monitor (check) named `example-ingress-default-domonitor` (`<ingressName>-<namespace>-domonitor`) will be created, along with `down`, `latency`, and `sslExpiry` alerts, sending notifications to the specified email address and Slack channel.<br>
 
-### Monitoring Annotations
+The same results can be achieved by creating a `DoMonitor` Resource as follows:
 
-- **`douz.com/do-monitor`:** Set to `"true"` to enable the operator for an Ingress resource.
+```yaml
+---
+apiVersion: douz.com/v1
+kind: DoMonitor
+metadata:
+  name: ingress-test-default-domonitor
+  namespace: default
+spec:
+  ingressName: ingress-test
+  host: "example.com"
+  config:
+    email: "your-email@example.com"
+    emailAlert: true
+    slackWebhook: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+    slackChannel: "#your-slack-channel"
+    slackAlert: true
+    latencyThreshold: 200
+    latencyPeriod: "2m"
+    sslExpiryThreshold: 30
+```
+
+### Ingress Annotations
+
+- **`douz.com/do-monitor`:** Set to `"true"` to enable the Operator for an Ingress resource.
 - **`douz.com/do-monitor-email`:** Email address to send alerts to (only verified emails in the DigitalOcean dashboard will work).
 - **`douz.com/do-monitor-slack-webhook`:** Slack webhook URL for sending alerts to a channel.
 - **`douz.com/do-monitor-slack-channel`:** Slack channel name (e.g., `#your-slack-channel`).
@@ -65,7 +96,7 @@ In this example, an Uptime Monitor (check) named `example-ingress-default-domoni
 - **`douz.com/do-monitor-latency-period`:** Period over which to measure latency (e.g., `"2m"`).
 - **`douz.com/do-monitor-ssl-expiry`:** Number of days before SSL certificate expiry to trigger an alert.
 
-At least one notification channel(email or Slack) must be provided.
+At least one notification channel (email or Slack) must be provided.
 
 ## Contributing
 
