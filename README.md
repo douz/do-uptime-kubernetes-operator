@@ -4,21 +4,28 @@ This Kubernetes Operator automates the creation, update, and deletion of [Digita
 
 ## Installation
 
-1. **Clone the Repository**
+1. **Add the public Helm repository**
    ```bash
-   git clone https://github.com/douz/do-uptime-kubernetes-operator
-   cd do-uptime-kubernetes-operator
+   helm repo add do-uptime-operator https://douz.github.io/do-uptime-kubernetes-operator
+   helm repo update
    ```
 
-2. **Create Kubernetes Secret**  
-   Update the `token` value in `03-do-token-secret.yaml` with your DigitalOcean API key (base64-encoded).
-
-3. **Apply the CRD, RBAC, Secret and Operator Manifests** 
+2. **Install with a new DigitalOcean token secret**
    ```bash
-   kubectl apply -f manifests/01-do-monitor-crd.yaml
-   kubectl apply -f manifests/02-rbac.yaml
-   kubectl apply -f manifests/03-do-token-secret.yaml
-   kubectl apply -f manifests/04-operator-deployment.yaml
+   helm upgrade --install do-uptime-operator do-uptime-operator/do-uptime-operator \
+     --namespace kube-system \
+     --create-namespace \
+     --set digitalocean.createSecret=true \
+     --set digitalocean.token='<DIGITALOCEAN_TOKEN>'
+   ```
+
+3. **Or install using an existing secret**
+   ```bash
+   helm upgrade --install do-uptime-operator do-uptime-operator/do-uptime-operator \
+     --namespace kube-system \
+     --create-namespace \
+     --set digitalocean.createSecret=false \
+     --set digitalocean.existingSecret=do-token-secret
    ```
 
 ### Operator Logs
@@ -27,43 +34,6 @@ If you need to troubleshoot or verify that the operator is running correctly, yo
 
 ```bash
 kubectl logs -f deployment/do-monitor-operator -f -n kube-system
-```
-
-## Helm Installation
-
-Install from local chart:
-
-```bash
-helm upgrade --install do-uptime-operator charts/do-uptime-operator \
-  --namespace kube-system \
-  --create-namespace \
-  --set digitalocean.createSecret=true \
-  --set digitalocean.token='<DIGITALOCEAN_TOKEN>'
-```
-
-Install using an existing secret:
-
-```bash
-helm upgrade --install do-uptime-operator charts/do-uptime-operator \
-  --namespace kube-system \
-  --create-namespace \
-  --set digitalocean.createSecret=false \
-  --set digitalocean.existingSecret=do-token-secret
-```
-
-### Publish as Public Helm Repo
-
-This repository includes:
-
-- `.github/workflows/helm-lint.yml` for chart validation on PRs and pushes.
-- `.github/workflows/helm-release.yml` to package/release charts from `charts/` on every push to `main`.
-
-Once the release workflow runs, add the public chart repo:
-
-```bash
-helm repo add do-uptime-operator https://douz.github.io/do-uptime-kubernetes-operator
-helm repo update
-helm search repo do-uptime-operator
 ```
 
 ## Usage
