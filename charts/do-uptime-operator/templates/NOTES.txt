@@ -1,0 +1,8 @@
+1. Verify the operator deployment:
+   kubectl get deployment {{ include "do-uptime-operator.fullname" . }} -n {{ .Release.Namespace }}
+
+2. Check logs:
+   kubectl logs -n {{ .Release.Namespace }} deployment/{{ include "do-uptime-operator.fullname" . }} -f
+
+3. Ensure your Ingress includes:
+   douz.com/do-monitor: "true"

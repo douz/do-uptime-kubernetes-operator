@@ -29,6 +29,43 @@ If you need to troubleshoot or verify that the operator is running correctly, yo
 kubectl logs -f deployment/do-monitor-operator -f -n kube-system
 ```
 
+## Helm Installation
+
+Install from local chart:
+
+```bash
+helm upgrade --install do-uptime-operator charts/do-uptime-operator \
+  --namespace kube-system \
+  --create-namespace \
+  --set digitalocean.createSecret=true \
+  --set digitalocean.token='<DIGITALOCEAN_TOKEN>'
+```
+
+Install using an existing secret:
+
+```bash
+helm upgrade --install do-uptime-operator charts/do-uptime-operator \
+  --namespace kube-system \
+  --create-namespace \
+  --set digitalocean.createSecret=false \
+  --set digitalocean.existingSecret=do-token-secret
+```
+
+### Publish as Public Helm Repo
+
+This repository includes:
+
+- `.github/workflows/helm-lint.yml` for chart validation on PRs and pushes.
+- `.github/workflows/helm-release.yml` to package/release charts from `charts/` on every push to `main`.
+
+Once the release workflow runs, add the public chart repo:
+
+```bash
+helm repo add do-uptime-operator https://douz.github.io/do-uptime-kubernetes-operator
+helm repo update
+helm search repo do-uptime-operator
+```
+
 ## Usage
 
 The `do-monitor-operator` will watch for Ingress resources with the `douz.com/do-monitor: "true"` annotation and create the Uptime Monitor and associated alerts accordingly. For example:
