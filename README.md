@@ -83,7 +83,7 @@ spec:
     slackAlert: true
     latencyThreshold: 200
     latencyPeriod: "2m"
-    sslExpiryThreshold: 30
+    sslExpiryPeriod: 30
 ```
 
 ### Ingress Annotations
@@ -101,6 +101,12 @@ At least one notification channel (email or Slack) must be provided.
 ## Contributing
 
 Contributions are welcome! Feel free to open issues or submit pull requests. Please follow the [DigitalOcean Uptime Monitor docs](https://docs.digitalocean.com/products/monitoring/) and [Kubernetes Operator patterns](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) when making changes.
+
+### Running Tests
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py'
+```
 
 ## License
 
