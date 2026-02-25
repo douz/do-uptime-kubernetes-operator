@@ -31,3 +31,4 @@ The secret must contain a `token` key.
 - `digitalocean.createSecret`: Create secret with token.
 - `digitalocean.existingSecret`: Existing secret name used when `createSecret=false`.
 - `resources`: Container resources.
+ 
