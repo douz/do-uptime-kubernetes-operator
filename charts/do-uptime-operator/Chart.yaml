@@ -1,0 +1,16 @@
+apiVersion: v2
+name: do-uptime-operator
+description: Kubernetes operator to manage DigitalOcean Uptime monitors and alerts from Ingress annotations
+type: application
+version: 0.1.0
+appVersion: "latest"
+home: https://github.com/douz/do-uptime-kubernetes-operator
+sources:
+  - https://github.com/douz/do-uptime-kubernetes-operator
+keywords:
+  - kubernetes
+  - operator
+  - digitalocean
+  - uptime
+maintainers:
+  - name: douz
