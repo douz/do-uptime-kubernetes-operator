@@ -1,4 +1,5 @@
 import importlib
+import logging
 import os
 import sys
 import types
@@ -63,6 +64,7 @@ def _install_test_stubs():
 
 
 _install_test_stubs()
+logging.disable(logging.CRITICAL)
 os.environ.pop("DIGITALOCEAN_TOKEN", None)
 op = importlib.import_module("domonitor_operator.domonitor_operator")
 
