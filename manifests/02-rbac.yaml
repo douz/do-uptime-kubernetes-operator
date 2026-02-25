@@ -21,7 +21,7 @@ rules:
     resources: ["customresourcedefinitions"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["douz.com"]
-    resources: ["domonitor"]
+    resources: ["domonitors"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 
 ---

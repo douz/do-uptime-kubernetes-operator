@@ -15,4 +15,4 @@ spec:
     slackAlert: true
     latencyThreshold: 500
     latencyPeriod: "2m"
-    sslExpiryThreshold: 14
+    sslExpiryPeriod: 14

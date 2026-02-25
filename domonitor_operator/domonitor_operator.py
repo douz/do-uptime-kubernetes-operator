@@ -1,35 +1,66 @@
 import kopf
 import logging
+import re
 import kubernetes
 from kubernetes.dynamic import DynamicClient
-from digitalocean import (
-    create_do_monitor,
-    update_do_monitor,
-    delete_do_monitor,
-    create_do_uptime_alert,
-    update_do_uptime_alert,
-    create_do_latency_alert,
-    update_do_latency_alert,
-    create_do_ssl_alert,
-    update_do_ssl_alert
-)
-
-# Load Kubernetes configuration (inside cluster or local kubeconfig)
 try:
-    kubernetes.config.load_incluster_config()
-except kubernetes.config.ConfigException:
-    kubernetes.config.load_kube_config()
+    from .digitalocean import (
+        create_do_monitor,
+        update_do_monitor,
+        delete_do_monitor,
+        create_do_uptime_alert,
+        update_do_uptime_alert,
+        create_do_latency_alert,
+        update_do_latency_alert,
+        create_do_ssl_alert,
+        update_do_ssl_alert
+    )
+except ImportError:
+    from digitalocean import (
+        create_do_monitor,
+        update_do_monitor,
+        delete_do_monitor,
+        create_do_uptime_alert,
+        update_do_uptime_alert,
+        create_do_latency_alert,
+        update_do_latency_alert,
+        create_do_ssl_alert,
+        update_do_ssl_alert
+    )
 
-# Kubernetes client
-k8s_client = kubernetes.client.ApiClient()
-dyn_client = DynamicClient(k8s_client)
+def initialize_do_monitor_api():
+    """Initialize dynamic CR API client with a graceful fallback for local test environments."""
+    try:
+        kubernetes.config.load_incluster_config()
+    except kubernetes.config.ConfigException:
+        try:
+            kubernetes.config.load_kube_config()
+        except kubernetes.config.ConfigException:
+            logging.warning("Kubernetes config not available; DoMonitor API client not initialized yet.")
+            return None
+
+    k8s_client = kubernetes.client.ApiClient()
+    dyn_client = DynamicClient(k8s_client)
+    return dyn_client.resources.get(api_version="douz.com/v1", kind="DoMonitor")
+
 
 # DoMonitor Custom Resource API
-do_monitor_api = dyn_client.resources.get(api_version="douz.com/v1", kind="DoMonitor")
+do_monitor_api = initialize_do_monitor_api()
 
 # ------------------------------------------------------------------------------
 # Helper function: Validate Ingress annotations
 # ------------------------------------------------------------------------------
+def parse_int_annotation(value: str, field_name: str, cr_name: str, namespace: str):
+    """Parse an integer annotation with clear error logging."""
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        logging.error(f"Invalid {field_name} value for DoMonitor: {cr_name} ({namespace})")
+        return None
+
+
 def validate_do_monitor_annotations(do_monitor_annotations: dict, cr_name: str, namespace: str) -> dict:
     """Validate the douz.com/do-monitor-* annotations for an Ingress resource."""
 
@@ -55,21 +86,70 @@ def validate_do_monitor_annotations(do_monitor_annotations: dict, cr_name: str, 
         logging.error(f"Latency Period is missing for DoMonitor: {cr_name} ({namespace})")
         return None
 
+    latency_threshold_int = parse_int_annotation(latency_threshold, "latency threshold", cr_name, namespace)
+    if latency_threshold and latency_threshold_int is None:
+        return None
+
+    ssl_expiry_period_int = parse_int_annotation(ssl_expiry_period, "ssl expiry period", cr_name, namespace)
+    if ssl_expiry_period and ssl_expiry_period_int is None:
+        return None
+
     return {
         "email": email,
         "email_alert": email_alert,
         "slack_webhook": slack_webhook,
         "slack_channel": slack_channel,
         "slack_alert": slack_alert,
-        "latency_threshold": int(latency_threshold) if latency_threshold else None,
+        "latency_threshold": latency_threshold_int,
         "latency_period": latency_period or "2m",
-        "ssl_expiry_period": int(ssl_expiry_period) if ssl_expiry_period else None,
+        "ssl_expiry_period": ssl_expiry_period_int,
     }
 
 # ------------------------------------------------------------------------------
 # Helper functions: CRUD for the DoMonitor CR (source of truth)
 # ------------------------------------------------------------------------------
 # Function to create or update the DoMonitor CR
+def build_cr_name(ingress_name: str, namespace: str, host: str) -> str:
+    """Build a stable DNS-safe CR name per host."""
+    safe_host = re.sub(r"[^a-z0-9-]+", "-", host.lower()).strip("-")
+    safe_host = safe_host or "host"
+    return f"{ingress_name}-{namespace}-{safe_host}-domonitor"
+
+
+def extract_ingress_hosts(spec: dict) -> list:
+    """Extract unique hosts from ingress rules."""
+    hosts = []
+    rules = (spec or {}).get("rules", [])
+    for rule in rules:
+        host = rule.get("host")
+        if host and host not in hosts:
+            hosts.append(host)
+    return hosts
+
+
+def list_domonitor_crs_for_ingress(namespace: str, ingress_name: str) -> list:
+    """List CR names associated with one ingress using labels."""
+    if do_monitor_api is None:
+        logging.error("DoMonitor API client is not initialized.")
+        return []
+    try:
+        cr_list = do_monitor_api.get(namespace=namespace)
+    except kubernetes.client.exceptions.ApiException as e:
+        logging.error(f"Failed to list DoMonitor CRs for ingress {ingress_name} ({namespace})")
+        logging.error(e)
+        return []
+
+    results = []
+    for item in getattr(cr_list, "items", []):
+        metadata = getattr(item, "metadata", {})
+        labels = metadata.get("labels", {}) if isinstance(metadata, dict) else getattr(metadata, "labels", {}) or {}
+        if labels.get("douz.com/ingress-name") == ingress_name:
+            name = metadata.get("name") if isinstance(metadata, dict) else getattr(metadata, "name", None)
+            if name:
+                results.append(name)
+    return results
+
+
 def create_or_update_do_monitor_cr(cr_name: str, namespace: str, ingress_name: str, host: str, spec_data: dict):
     """
     Create or update the DoMonitor Custom Resource with relevant fields from the
@@ -84,6 +164,10 @@ def create_or_update_do_monitor_cr(cr_name: str, namespace: str, ingress_name: s
         "metadata": {
             "name": cr_name,
             "namespace": namespace,
+            "labels": {
+                "douz.com/managed-by": "do-monitor-operator",
+                "douz.com/ingress-name": ingress_name,
+            },
         },
         "spec": {
             "ingressName": ingress_name,
@@ -103,6 +187,9 @@ def create_or_update_do_monitor_cr(cr_name: str, namespace: str, ingress_name: s
     }
 
     # Attempt an update; if not found, create
+    if do_monitor_api is None:
+        logging.error("DoMonitor API client is not initialized.")
+        return
     try:
         do_monitor_api.get(name=cr_name, namespace=namespace)
         # Merge patch - just replace the relevant fields
@@ -116,13 +203,6 @@ def create_or_update_do_monitor_cr(cr_name: str, namespace: str, ingress_name: s
     except kubernetes.client.exceptions.ApiException as e:
         if e.status == 404:
             # Create new CR
-            # Set the value of the monitorID and alerts to None in the payload to avoid errors
-            payload["spec"]["monitorID"] = None
-            payload["spec"]["alerts"] = {
-                "uptimeAlertID": None,
-                "latencyAlertID": None,
-                "sslExpiryAlertID": None
-            }
             do_monitor_api.create(body=payload)
             logging.info(f"Created DoMonitor CR: {cr_name} ({namespace})")
         else:
@@ -132,12 +212,51 @@ def create_or_update_do_monitor_cr(cr_name: str, namespace: str, ingress_name: s
 # Function to delete the DoMonitor CR
 def delete_do_monitor_cr(cr_name: str, namespace: str):
     """Delete the DoMonitor Custom Resource when the Ingress is deleted."""
+    if do_monitor_api is None:
+        logging.error("DoMonitor API client is not initialized.")
+        return
     try:
         do_monitor_api.delete(name=cr_name, namespace=namespace)
         logging.info(f"Deleted DoMonitor CR: {cr_name} ({namespace})")
     except kubernetes.client.exceptions.ApiException as e:
+        if e.status == 404:
+            return
         logging.error(f"Failed to delete DoMonitor CR: {cr_name} ({namespace})")
         logging.error(e)
+
+
+def reconcile_ingress_to_crs(spec: dict, annotations: dict, ingress_name: str, namespace: str):
+    """Reconcile per-host DoMonitor CRs from ingress state."""
+    hosts = extract_ingress_hosts(spec)
+    if not hosts:
+        logging.info(f"Ingress has no hosts; cleaning up DoMonitor CRs for {ingress_name} ({namespace})")
+        for existing_cr in list_domonitor_crs_for_ingress(namespace, ingress_name):
+            delete_do_monitor_cr(existing_cr, namespace)
+        return
+
+    desired_cr_names = set()
+    for host in hosts:
+        cr_name = build_cr_name(ingress_name, namespace, host)
+        do_monitor_annotations = {
+            annotation: value
+            for annotation, value in (annotations or {}).items()
+            if annotation.startswith("douz.com/do-monitor-")
+        }
+        spec_data = validate_do_monitor_annotations(do_monitor_annotations, cr_name, namespace)
+        if spec_data is None:
+            return
+        create_or_update_do_monitor_cr(
+            cr_name=cr_name,
+            namespace=namespace,
+            ingress_name=ingress_name,
+            host=host,
+            spec_data=spec_data
+        )
+        desired_cr_names.add(cr_name)
+
+    for existing_cr in list_domonitor_crs_for_ingress(namespace, ingress_name):
+        if existing_cr not in desired_cr_names:
+            delete_do_monitor_cr(existing_cr, namespace)
 
 # ------------------------------------------------------------------------------
 # Ingress handlers - Functions to create, update, and delete the CR based on
@@ -151,60 +270,31 @@ def ingress_created(spec, annotations, name, namespace, **kwargs):
     When an Ingress is created with douz.com/do-monitor: true,
     create or update a DoMonitor CR. The CRD handler will handle DO resources.
     """
-
-    cr_name = f"{name}-{namespace}-domonitor"
-    do_monitor_annotations = {annotation: value for annotation, value in annotations.items() if annotation.startswith("douz.com/do-monitor-")}
-
-    spec_data = validate_do_monitor_annotations(do_monitor_annotations, cr_name, namespace)
-    if spec_data is None:
-        return
-
-    for rule in spec["rules"]:
-        monitor_url = rule["host"]
-        create_or_update_do_monitor_cr(
-            cr_name=cr_name,
-            namespace=namespace,
-            ingress_name=name,
-            host=monitor_url,
-            spec_data=spec_data
-        )
+    reconcile_ingress_to_crs(spec, annotations, name, namespace)
 
 # Update
-@kopf.on.update("networking.k8s.io", "v1", "ingresses",
-                annotations={"douz.com/do-monitor": "true"})
+@kopf.on.update("networking.k8s.io", "v1", "ingresses")
 def ingress_updated(spec, annotations, name, namespace, **kwargs):
     """
     When an Ingress is updated with douz.com/do-monitor: true,
     update the DoMonitor CR accordingly.
     """
-
-    cr_name = f"{name}-{namespace}-domonitor"
-    do_monitor_annotations = {annotation: value for annotation, value in annotations.items() if annotation.startswith("douz.com/do-monitor-")}
-
-    spec_data = validate_do_monitor_annotations(do_monitor_annotations, cr_name, namespace)
-    if spec_data is None:
+    if (annotations or {}).get("douz.com/do-monitor") == "true":
+        reconcile_ingress_to_crs(spec, annotations, name, namespace)
         return
 
-    for rule in spec["rules"]:
-        monitor_url = rule["host"]
-        create_or_update_do_monitor_cr(
-            cr_name=cr_name,
-            namespace=namespace,
-            ingress_name=name,
-            host=monitor_url,
-            spec_data=spec_data
-        )
+    for existing_cr in list_domonitor_crs_for_ingress(namespace, name):
+        delete_do_monitor_cr(existing_cr, namespace)
 
 # Delete
-@kopf.on.delete("networking.k8s.io", "v1", "ingresses",
-                annotations={"douz.com/do-monitor": "true"})
+@kopf.on.delete("networking.k8s.io", "v1", "ingresses")
 def ingress_deleted(name, namespace, **kwargs):
     """
     When an annotated Ingress is deleted, delete the corresponding DoMonitor CR.
     The CR Handler will remove the DO monitor & alerts.
     """
-    cr_name = f"{name}-{namespace}-domonitor"
-    delete_do_monitor_cr(cr_name, namespace)
+    for existing_cr in list_domonitor_crs_for_ingress(namespace, name):
+        delete_do_monitor_cr(existing_cr, namespace)
 
 # ------------------------------------------------------------------------------
 # Helper functions: Validate spec, extract ids from DoMonitor CR spec and patch CR
@@ -267,7 +357,9 @@ def extract_current_ids(cr) -> dict:
 # Patch CR (Update)
 def patch_domonitor_status(name, namespace, patch_body: dict):
     """Utility to patch the DoMonitor CR (e.g., store DO monitor IDs)."""
-
+    if do_monitor_api is None:
+        logging.error("DoMonitor API client is not initialized.")
+        return
     try:
         do_monitor_api.patch(
             name=name,
@@ -364,12 +456,18 @@ def domonitor_updated(body, spec, name, namespace, **kwargs):
     # Extract existing DO resource IDs from the CR
     current_ids = extract_current_ids(body)
 
-    # Update DO monitor
-    update_do_monitor(
-        monitor_id=current_ids["monitor_id"],
-        url=spec_config["host"],
-        monitor_name=name
-    )
+    monitor_id = current_ids["monitor_id"]
+    if monitor_id:
+        update_do_monitor(
+            monitor_id=monitor_id,
+            url=spec_config["host"],
+            monitor_name=name
+        )
+    else:
+        monitor_id = create_do_monitor(url=spec_config["host"], monitor_name=name)
+        if not monitor_id:
+            return
+        patch_domonitor_status(name, namespace, {"spec": {"monitorID": monitor_id}})
 
     # Update or create alerts
     patch_cr = False
@@ -377,7 +475,7 @@ def domonitor_updated(body, spec, name, namespace, **kwargs):
 
     if (spec_config.get("email_alert") or spec_config.get("slack_alert")) and current_ids["uptime_alert_id"]:
         update_do_uptime_alert(
-            monitor_id=current_ids["monitor_id"],
+            monitor_id=monitor_id,
             alert_id=current_ids["uptime_alert_id"],
             email_alert=spec_config["email_alert"],
             email=spec_config["email"],
@@ -387,7 +485,7 @@ def domonitor_updated(body, spec, name, namespace, **kwargs):
         )
     elif spec_config.get("email_alert") or spec_config.get("slack_alert"):
         uptime_alert_id = create_do_uptime_alert(
-            monitor_id=current_ids["monitor_id"],
+            monitor_id=monitor_id,
             email_alert=spec_config["email_alert"],
             email=spec_config["email"],
             slack_alert=spec_config["slack_alert"],
@@ -403,7 +501,7 @@ def domonitor_updated(body, spec, name, namespace, **kwargs):
 
     if spec_config.get("latency_threshold") and spec_config.get("latency_period") and current_ids["latency_alert_id"]:
         update_do_latency_alert(
-            monitor_id=current_ids["monitor_id"],
+            monitor_id=monitor_id,
             alert_id=current_ids["latency_alert_id"],
             email_alert=spec_config["email_alert"],
             email=spec_config["email"],
@@ -415,7 +513,7 @@ def domonitor_updated(body, spec, name, namespace, **kwargs):
         )
     elif spec_config.get("latency_threshold") and spec_config.get("latency_period"):
         latency_alert_id = create_do_latency_alert(
-            monitor_id=current_ids["monitor_id"],
+            monitor_id=monitor_id,
             latency_threshold=spec_config["latency_threshold"],
             latency_period=spec_config["latency_period"],
             email_alert=spec_config["email_alert"],
@@ -433,7 +531,7 @@ def domonitor_updated(body, spec, name, namespace, **kwargs):
 
     if spec_config.get("ssl_expiry_period") and current_ids["ssl_alert_id"]:
         update_do_ssl_alert(
-            monitor_id=current_ids["monitor_id"],
+            monitor_id=monitor_id,
             alert_id=current_ids["ssl_alert_id"],
             email_alert=spec_config["email_alert"],
             email=spec_config["email"],
@@ -444,7 +542,7 @@ def domonitor_updated(body, spec, name, namespace, **kwargs):
         )
     elif spec_config.get("ssl_expiry_period"):
         ssl_alert_id = create_do_ssl_alert(
-            monitor_id=current_ids["monitor_id"],
+            monitor_id=monitor_id,
             email_alert=spec_config["email_alert"],
             email=spec_config["email"],
             slack_alert=spec_config["slack_alert"],

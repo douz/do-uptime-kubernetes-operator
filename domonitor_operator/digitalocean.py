@@ -3,8 +3,15 @@ import logging
 from pydo import Client
 
 # DigitalOcean client
-DO_API_TOKEN = os.environ.get("DIGITALOCEAN_TOKEN").strip()
-client = Client(token=DO_API_TOKEN)
+DO_API_TOKEN = (os.environ.get("DIGITALOCEAN_TOKEN") or "").strip()
+client = Client(token=DO_API_TOKEN) if DO_API_TOKEN else None
+
+
+def _ensure_client() -> bool:
+    if client is not None:
+        return True
+    logging.error("DIGITALOCEAN_TOKEN is not set; skipping DigitalOcean API call.")
+    return False
 
 # ------------------------------------------------------------------------------
 # Helper functions: Create Uptime Monitor payload and Alert payload
@@ -55,6 +62,8 @@ def create_alert_payload(alert_type: str, monitor_id: str, email_alert: bool, sl
 # Create a new DigitalOcean Uptime Monitor
 def create_do_monitor(url: str, monitor_name: str) -> str:
     """Create a New DigitalOcean Uptime Monitor"""
+    if not _ensure_client():
+        return None
 
     payload = create_monitor_payload(url, monitor_name)
 
@@ -70,6 +79,8 @@ def create_do_monitor(url: str, monitor_name: str) -> str:
 # Update an existing DigitalOcean Uptime Monitor   
 def update_do_monitor(url: str, monitor_name: str, monitor_id: str):
     """Update an Existing DigitalOcean Uptime Monitor"""
+    if not _ensure_client():
+        return
     
     payload = create_monitor_payload(url, monitor_name)
 
@@ -82,6 +93,8 @@ def update_do_monitor(url: str, monitor_name: str, monitor_id: str):
 # Delete an existing DigitalOcean Uptime Monitor
 def delete_do_monitor(monitor_id: str):
     """Delete an Existing DigitalOcean Uptime Monitor"""
+    if not _ensure_client():
+        return
 
     try:
         client.uptime.delete_check(check_id=monitor_id)
@@ -93,6 +106,8 @@ def delete_do_monitor(monitor_id: str):
 def create_do_uptime_alert(monitor_id: str, email_alert: bool = False, slack_alert: bool = False,
                            email: str = None, slack_webhook: str = None, slack_channel: str = None) -> str:
     """Create Uptime Alert for a DigitalOcean Uptime Monitor"""
+    if not _ensure_client():
+        return None
 
     payload = create_alert_payload(
         "down",
@@ -117,6 +132,8 @@ def create_do_uptime_alert(monitor_id: str, email_alert: bool = False, slack_ale
 def update_do_uptime_alert(monitor_id: str, alert_id: str, email_alert: bool = False, slack_alert: bool = False,
                            email: str = None, slack_webhook: str = None, slack_channel: str = None):
     """Update Uptime Alert for a DigitalOcean Uptime Monitor"""
+    if not _ensure_client():
+        return
 
     payload = create_alert_payload(
         "down",
@@ -140,6 +157,8 @@ def create_do_latency_alert(monitor_id: str, email_alert: bool = False, slack_al
                             email: str = None, slack_webhook: str = None, slack_channel: str = None,
                             latency_threshold: int = 0, latency_period: str = "2m") -> str:
     """Create Latency Alert for a DigitalOcean Uptime Monitor"""
+    if not _ensure_client():
+        return None
 
     payload = create_alert_payload(
         "latency",
@@ -166,6 +185,8 @@ def update_do_latency_alert(monitor_id: str, alert_id: str, email_alert: bool = 
                             email: str = None, slack_webhook: str = None, slack_channel: str = None,
                             latency_threshold: int = 0, latency_period: str = "2m"):
     """Update Latency Alert for a DigitalOcean Uptime Monitor"""
+    if not _ensure_client():
+        return
 
     payload = create_alert_payload(
         "latency",
@@ -191,6 +212,8 @@ def create_do_ssl_alert(monitor_id: str, email_alert: bool = False, slack_alert:
                         email: str = None, slack_webhook: str = None, slack_channel: str = None,
                         days_left: int = 30) -> str:
     """Create SSL Expiration Alert for a DigitalOcean Uptime Monitor"""
+    if not _ensure_client():
+        return None
 
     payload = create_alert_payload(
         "ssl_expiry",
@@ -218,6 +241,8 @@ def update_do_ssl_alert(monitor_id: str, alert_id: str, email_alert: bool = Fals
                         email: str = None, slack_webhook: str = None, slack_channel: str = None,
                         days_left: int = 30):
     """Update SSL Expiration Alert for a DigitalOcean Uptime Monitor"""
+    if not _ensure_client():
+        return
 
     payload = create_alert_payload(
         "ssl_expiry",
@@ -241,6 +266,8 @@ def update_do_ssl_alert(monitor_id: str, alert_id: str, email_alert: bool = Fals
 # Function to delete an alert for a DigitalOcean Uptime Monitor
 def delete_do_alert(monitor_id: str, alert_id: str, alert_type: str):
     """Delete an Alert for a DigitalOcean Uptime Monitor"""
+    if not _ensure_client():
+        return
 
     try:
         client.uptime.delete_alert(check_id=monitor_id, alert_id=alert_id)
