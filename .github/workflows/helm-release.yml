@@ -7,31 +7,68 @@ on:
     paths:
       - 'charts/**'
       - '.github/workflows/helm-release.yml'
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      CHART_REPO_URL: https://charts.douz.io
+      TARGET_REPO: douz/helm-charts
+      TARGET_BRANCH: gh-pages
+      PUBLISH_TOKEN: ${{ secrets.HELM_REPO_TOKEN || secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout
+      - name: Checkout source repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Configure Git
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Package charts
+        shell: bash
         run: |
+          set -euo pipefail
+          mkdir -p .chart-packages
+          shopt -s nullglob
+          for chart_dir in charts/*; do
+            [ -d "$chart_dir" ] || continue
+            helm package "$chart_dir" --destination .chart-packages
+          done
+          ls -lah .chart-packages
+
+      - name: Checkout central Helm repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.TARGET_REPO }}
+          ref: ${{ env.TARGET_BRANCH }}
+          path: .helm-repo
+          token: ${{ env.PUBLISH_TOKEN }}
+
+      - name: Update chart repo index
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          cp .chart-packages/*.tgz .helm-repo/
+          cd .helm-repo
+          helm repo index . --url "${CHART_REPO_URL}" --merge index.yaml
+
+      - name: Commit and push updates
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd .helm-repo
           git config user.name github-actions
           git config user.email github-actions@github.com
-
-      - name: Run chart releaser
-        uses: helm/chart-releaser-action@v1.7.0
-        with:
-          charts_dir: charts
-          charts_repo_url: https://charts.douz.io
-          pages_branch: gh-pages
-        env:
-          CR_OWNER: douz
-          CR_GIT_REPO: helm-charts
-          CR_TOKEN: "${{ secrets.HELM_REPO_TOKEN || secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}"
+          git add *.tgz index.yaml
+          if git diff --cached --quiet; then
+            echo "No chart repository changes to publish."
+            exit 0
+          fi
+          git commit -m "chore: publish charts from do-uptime-kubernetes-operator"
+          git push origin "${TARGET_BRANCH}"
