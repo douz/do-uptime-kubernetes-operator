@@ -20,7 +20,7 @@ rules:
   - apiGroups: ["apiextensions.k8s.io"]
     resources: ["customresourcedefinitions"]
     verbs: ["get", "list", "watch"]
-  - apiGroups: ["douz.com"]
+  - apiGroups: ["douz.io"]
     resources: ["domonitors"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 

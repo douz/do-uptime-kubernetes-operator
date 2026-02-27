@@ -5,4 +5,4 @@
    kubectl logs -n {{ .Release.Namespace }} deployment/{{ include "do-uptime-operator.fullname" . }} -f
 
 3. Ensure your Ingress includes:
-   douz.com/do-monitor: "true"
+   douz.io/do-monitor: "true"

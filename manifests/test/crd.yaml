@@ -1,5 +1,5 @@
 ---
-apiVersion: douz.com/v1
+apiVersion: douz.io/v1
 kind: DoMonitor
 metadata:
   name: ingress-test-default-domonitor

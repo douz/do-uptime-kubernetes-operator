@@ -71,8 +71,8 @@ op = importlib.import_module("domonitor_operator.domonitor_operator")
 
 def _valid_annotations():
     return {
-        "douz.com/do-monitor": "true",
-        "douz.com/do-monitor-email": "alerts@example.com",
+        "douz.io/do-monitor": "true",
+        "douz.io/do-monitor-email": "alerts@example.com",
     }
 
 
@@ -83,9 +83,9 @@ def _spec_with_hosts(*hosts):
 class OperatorReconcileTests(unittest.TestCase):
     def test_validate_do_monitor_annotations_rejects_invalid_integers(self):
         annotations = {
-            "douz.com/do-monitor-email": "alerts@example.com",
-            "douz.com/do-monitor-latency-threshold": "not-an-int",
-            "douz.com/do-monitor-latency-period": "2m",
+            "douz.io/do-monitor-email": "alerts@example.com",
+            "douz.io/do-monitor-latency-threshold": "not-an-int",
+            "douz.io/do-monitor-latency-period": "2m",
         }
 
         result = op.validate_do_monitor_annotations(annotations, "cr", "default")
