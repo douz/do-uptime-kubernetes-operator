@@ -34,4 +34,4 @@ jobs:
         env:
           CR_OWNER: douz
           CR_GIT_REPO: helm-charts
-          CR_TOKEN: "${{ secrets.HELM_REPO_TOKEN || secrets.GITHUB_TOKEN }}"
+          CR_TOKEN: "${{ secrets.HELM_REPO_TOKEN || secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}"

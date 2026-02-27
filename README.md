@@ -40,12 +40,13 @@ One-time GitHub and DNS setup:
    - `CNAME` record for host `charts` pointing to `douz.github.io`.
 4. Create a fine-grained GitHub token with `Contents: Read and write` permission on `douz/helm-charts`.
 5. In this repository, add secret `HELM_REPO_TOKEN` with that token value.
+   - This workflow also accepts `GH_TOKEN` as fallback.
 
 To publish charts from other repositories into the same `charts.douz.io` index, reuse this workflow pattern with:
 
 - `CR_OWNER=douz`
 - `CR_GIT_REPO=helm-charts`
-- `CR_TOKEN=${{ secrets.HELM_REPO_TOKEN }}`
+- `CR_TOKEN=${{ secrets.HELM_REPO_TOKEN || secrets.GH_TOKEN }}`
 
 ### Operator Logs
 
