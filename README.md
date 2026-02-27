@@ -30,14 +30,22 @@ This Kubernetes Operator automates the creation, update, and deletion of [Digita
 
 ### Helm Repo Hosting (`charts.douz.io`)
 
-This repository is configured to publish Helm charts from `charts/` to GitHub Pages using `helm/chart-releaser-action`, with the chart repository URL set to `https://charts.douz.io`.
+This repository is configured to publish Helm charts from `charts/` into the centralized repository `douz/helm-charts` using `helm/chart-releaser-action`, with the chart repository URL set to `https://charts.douz.io`.
 
 One-time GitHub and DNS setup:
 
-1. In GitHub repo settings, enable **Pages** from branch `gh-pages` and folder `/ (root)`.
-2. In Pages custom domain, set `charts.douz.io` and enable **Enforce HTTPS**.
+1. In `douz/helm-charts` repo settings, enable **Pages** from branch `gh-pages` and folder `/ (root)`.
+2. In `douz/helm-charts` Pages custom domain, set `charts.douz.io` and enable **Enforce HTTPS**.
 3. In your DNS provider for `douz.io`, add:
    - `CNAME` record for host `charts` pointing to `douz.github.io`.
+4. Create a fine-grained GitHub token with `Contents: Read and write` permission on `douz/helm-charts`.
+5. In this repository, add secret `HELM_REPO_TOKEN` with that token value.
+
+To publish charts from other repositories into the same `charts.douz.io` index, reuse this workflow pattern with:
+
+- `CR_OWNER=douz`
+- `CR_GIT_REPO=helm-charts`
+- `CR_TOKEN=${{ secrets.HELM_REPO_TOKEN }}`
 
 ### Operator Logs
 

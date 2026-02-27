@@ -32,4 +32,6 @@ jobs:
           charts_repo_url: https://charts.douz.io
           pages_branch: gh-pages
         env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_OWNER: douz
+          CR_GIT_REPO: helm-charts
+          CR_TOKEN: "${{ secrets.HELM_REPO_TOKEN || secrets.GITHUB_TOKEN }}"
