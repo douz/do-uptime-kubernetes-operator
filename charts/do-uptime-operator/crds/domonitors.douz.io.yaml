@@ -2,9 +2,9 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: domonitors.douz.com
+  name: domonitors.douz.io
 spec:
-  group: douz.com
+  group: douz.io
   scope: Namespaced
   names:
     plural: domonitors

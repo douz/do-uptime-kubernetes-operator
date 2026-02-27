@@ -41,7 +41,7 @@ def initialize_do_monitor_api():
 
     k8s_client = kubernetes.client.ApiClient()
     dyn_client = DynamicClient(k8s_client)
-    return dyn_client.resources.get(api_version="douz.com/v1", kind="DoMonitor")
+    return dyn_client.resources.get(api_version="douz.io/v1", kind="DoMonitor")
 
 
 # DoMonitor Custom Resource API
@@ -62,14 +62,14 @@ def parse_int_annotation(value: str, field_name: str, cr_name: str, namespace: s
 
 
 def validate_do_monitor_annotations(do_monitor_annotations: dict, cr_name: str, namespace: str) -> dict:
-    """Validate the douz.com/do-monitor-* annotations for an Ingress resource."""
+    """Validate the douz.io/do-monitor-* annotations for an Ingress resource."""
 
-    email = do_monitor_annotations.get("douz.com/do-monitor-email")
-    slack_webhook = do_monitor_annotations.get("douz.com/do-monitor-slack-webhook")
-    slack_channel = do_monitor_annotations.get("douz.com/do-monitor-slack-channel")
-    latency_threshold = do_monitor_annotations.get("douz.com/do-monitor-latency-threshold")
-    latency_period = do_monitor_annotations.get("douz.com/do-monitor-latency-period")
-    ssl_expiry_period = do_monitor_annotations.get("douz.com/do-monitor-ssl-expiry")
+    email = do_monitor_annotations.get("douz.io/do-monitor-email")
+    slack_webhook = do_monitor_annotations.get("douz.io/do-monitor-slack-webhook")
+    slack_channel = do_monitor_annotations.get("douz.io/do-monitor-slack-channel")
+    latency_threshold = do_monitor_annotations.get("douz.io/do-monitor-latency-threshold")
+    latency_period = do_monitor_annotations.get("douz.io/do-monitor-latency-period")
+    ssl_expiry_period = do_monitor_annotations.get("douz.io/do-monitor-ssl-expiry")
 
     email_alert = bool(email)
     slack_alert = bool(slack_webhook and slack_channel)
@@ -143,7 +143,7 @@ def list_domonitor_crs_for_ingress(namespace: str, ingress_name: str) -> list:
     for item in getattr(cr_list, "items", []):
         metadata = getattr(item, "metadata", {})
         labels = metadata.get("labels", {}) if isinstance(metadata, dict) else getattr(metadata, "labels", {}) or {}
-        if labels.get("douz.com/ingress-name") == ingress_name:
+        if labels.get("douz.io/ingress-name") == ingress_name:
             name = metadata.get("name") if isinstance(metadata, dict) else getattr(metadata, "name", None)
             if name:
                 results.append(name)
@@ -159,14 +159,14 @@ def create_or_update_do_monitor_cr(cr_name: str, namespace: str, ingress_name: s
     reconcile the CR to the actual DigitalOcean resources.
     """
     payload = {
-        "apiVersion": "douz.com/v1",
+        "apiVersion": "douz.io/v1",
         "kind": "DoMonitor",
         "metadata": {
             "name": cr_name,
             "namespace": namespace,
             "labels": {
-                "douz.com/managed-by": "do-monitor-operator",
-                "douz.com/ingress-name": ingress_name,
+                "douz.io/managed-by": "do-monitor-operator",
+                "douz.io/ingress-name": ingress_name,
             },
         },
         "spec": {
@@ -240,7 +240,7 @@ def reconcile_ingress_to_crs(spec: dict, annotations: dict, ingress_name: str, n
         do_monitor_annotations = {
             annotation: value
             for annotation, value in (annotations or {}).items()
-            if annotation.startswith("douz.com/do-monitor-")
+            if annotation.startswith("douz.io/do-monitor-")
         }
         spec_data = validate_do_monitor_annotations(do_monitor_annotations, cr_name, namespace)
         if spec_data is None:
@@ -264,10 +264,10 @@ def reconcile_ingress_to_crs(spec: dict, annotations: dict, ingress_name: str, n
 # ------------------------------------------------------------------------------
 # Create
 @kopf.on.create("networking.k8s.io", "v1", "ingresses",
-                annotations={"douz.com/do-monitor": "true"})
+                annotations={"douz.io/do-monitor": "true"})
 def ingress_created(spec, annotations, name, namespace, **kwargs):
     """
-    When an Ingress is created with douz.com/do-monitor: true,
+    When an Ingress is created with douz.io/do-monitor: true,
     create or update a DoMonitor CR. The CRD handler will handle DO resources.
     """
     reconcile_ingress_to_crs(spec, annotations, name, namespace)
@@ -276,10 +276,10 @@ def ingress_created(spec, annotations, name, namespace, **kwargs):
 @kopf.on.update("networking.k8s.io", "v1", "ingresses")
 def ingress_updated(spec, annotations, name, namespace, **kwargs):
     """
-    When an Ingress is updated with douz.com/do-monitor: true,
+    When an Ingress is updated with douz.io/do-monitor: true,
     update the DoMonitor CR accordingly.
     """
-    if (annotations or {}).get("douz.com/do-monitor") == "true":
+    if (annotations or {}).get("douz.io/do-monitor") == "true":
         reconcile_ingress_to_crs(spec, annotations, name, namespace)
         return
 
@@ -376,7 +376,7 @@ def patch_domonitor_status(name, namespace, patch_body: dict):
 # resources based on CR events
 # ------------------------------------------------------------------------------
 # Function to create the DO monitor and alerts
-@kopf.on.create("douz.com", "v1", "domonitors")
+@kopf.on.create("douz.io", "v1", "domonitors")
 def domonitor_created(body, spec, name, namespace, **kwargs):
     """When a new DoMonitor CR is created, create DO resources."""
 
@@ -441,7 +441,7 @@ def domonitor_created(body, spec, name, namespace, **kwargs):
     patch_domonitor_status(name, namespace, patch_body)
 
 # Function to update the DO monitor and alerts
-@kopf.on.update("douz.com", "v1", "domonitors")
+@kopf.on.update("douz.io", "v1", "domonitors")
 def domonitor_updated(body, spec, name, namespace, **kwargs):
     """
     When the DoMonitor CR is updated, update the DO resources
@@ -562,7 +562,7 @@ def domonitor_updated(body, spec, name, namespace, **kwargs):
         patch_domonitor_status(name, namespace, patch_payload)
 
 # function to delete the DO monitor and alerts
-@kopf.on.delete("douz.com", "v1", "domonitors")
+@kopf.on.delete("douz.io", "v1", "domonitors")
 def domonitor_deleted(body, name, namespace, **kwargs):
     """
     When the DoMonitor CR is deleted, remove the associated

@@ -3,14 +3,14 @@ kind: Ingress
 metadata:
   annotations:
     # Enable DigitalOcean Monitoring, setting this to true will create a `down` alert
-    douz.com/do-monitor: "true"
+    douz.io/do-monitor: "true"
     # At least one alerting channel must be defined
-    douz.com/do-monitor-email: "test@example.com" # Email must be verified in DigitalOcean
-    douz.com/do-monitor-slack-webhook: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX # Slack webhook
-    douz.com/do-monitor-slack-channel: "#alerts" # Slack channel
-    douz.com/do-monitor-latency-threshold: "500" # (optional) latency threshold in milliseconds, this will create a `latency` alert
-    douz.com/do-monitor-latency-period: "3m" # Mandatory if `latency-threshold` is set, this is the period of time to check the latency
-    douz.com/do-monitor-ssl-expiry: "14" # (optional) SSL certificate expiry threshold in days, this will create a `ssl_expiry` alert
+    douz.io/do-monitor-email: "test@example.com" # Email must be verified in DigitalOcean
+    douz.io/do-monitor-slack-webhook: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX # Slack webhook
+    douz.io/do-monitor-slack-channel: "#alerts" # Slack channel
+    douz.io/do-monitor-latency-threshold: "500" # (optional) latency threshold in milliseconds, this will create a `latency` alert
+    douz.io/do-monitor-latency-period: "3m" # Mandatory if `latency-threshold` is set, this is the period of time to check the latency
+    douz.io/do-monitor-ssl-expiry: "14" # (optional) SSL certificate expiry threshold in days, this will create a `ssl_expiry` alert
   labels:
   name: ingress-test
   namespace: default

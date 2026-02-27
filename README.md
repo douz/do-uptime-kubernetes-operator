@@ -38,7 +38,7 @@ kubectl logs -f deployment/do-monitor-operator -f -n kube-system
 
 ## Usage
 
-The `do-monitor-operator` will watch for Ingress resources with the `douz.com/do-monitor: "true"` annotation and create the Uptime Monitor and associated alerts accordingly. For example:
+The `do-monitor-operator` will watch for Ingress resources with the `douz.io/do-monitor: "true"` annotation and create the Uptime Monitor and associated alerts accordingly. For example:
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -47,13 +47,13 @@ metadata:
   name: example-ingress
   namespace: default
   annotations:
-    douz.com/do-monitor: "true"
-    douz.com/do-monitor-email: "your-email@example.com"
-    douz.com/do-monitor-slack-webhook: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
-    douz.com/do-monitor-slack-channel: "#your-slack-channel"
-    douz.com/do-monitor-latency-threshold: "200"
-    douz.com/do-monitor-latency-period: "2m"
-    douz.com/do-monitor-ssl-expiry: "30"
+    douz.io/do-monitor: "true"
+    douz.io/do-monitor-email: "your-email@example.com"
+    douz.io/do-monitor-slack-webhook: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+    douz.io/do-monitor-slack-channel: "#your-slack-channel"
+    douz.io/do-monitor-latency-threshold: "200"
+    douz.io/do-monitor-latency-period: "2m"
+    douz.io/do-monitor-ssl-expiry: "30"
 spec:
   rules:
     - host: example.com
@@ -74,7 +74,7 @@ The same results can be achieved by creating a `DoMonitor` Resource as follows:
 
 ```yaml
 ---
-apiVersion: douz.com/v1
+apiVersion: douz.io/v1
 kind: DoMonitor
 metadata:
   name: ingress-test-default-domonitor
@@ -95,13 +95,13 @@ spec:
 
 ### Ingress Annotations
 
-- **`douz.com/do-monitor`:** Set to `"true"` to enable the Operator for an Ingress resource.
-- **`douz.com/do-monitor-email`:** Email address to send alerts to (only verified emails in the DigitalOcean dashboard will work).
-- **`douz.com/do-monitor-slack-webhook`:** Slack webhook URL for sending alerts to a channel.
-- **`douz.com/do-monitor-slack-channel`:** Slack channel name (e.g., `#your-slack-channel`).
-- **`douz.com/do-monitor-latency-threshold`:** Latency threshold in milliseconds.
-- **`douz.com/do-monitor-latency-period`:** Period over which to measure latency (e.g., `"2m"`).
-- **`douz.com/do-monitor-ssl-expiry`:** Number of days before SSL certificate expiry to trigger an alert.
+- **`douz.io/do-monitor`:** Set to `"true"` to enable the Operator for an Ingress resource.
+- **`douz.io/do-monitor-email`:** Email address to send alerts to (only verified emails in the DigitalOcean dashboard will work).
+- **`douz.io/do-monitor-slack-webhook`:** Slack webhook URL for sending alerts to a channel.
+- **`douz.io/do-monitor-slack-channel`:** Slack channel name (e.g., `#your-slack-channel`).
+- **`douz.io/do-monitor-latency-threshold`:** Latency threshold in milliseconds.
+- **`douz.io/do-monitor-latency-period`:** Period over which to measure latency (e.g., `"2m"`).
+- **`douz.io/do-monitor-ssl-expiry`:** Number of days before SSL certificate expiry to trigger an alert.
 
 At least one notification channel (email or Slack) must be provided.
 
