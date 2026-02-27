@@ -6,7 +6,7 @@ This Kubernetes Operator automates the creation, update, and deletion of [Digita
 
 1. **Add the public Helm repository**
    ```bash
-   helm repo add do-uptime-operator https://douz.github.io/do-uptime-kubernetes-operator
+   helm repo add do-uptime-operator https://charts.douz.io
    helm repo update
    ```
 
@@ -27,6 +27,17 @@ This Kubernetes Operator automates the creation, update, and deletion of [Digita
      --set digitalocean.createSecret=false \
      --set digitalocean.existingSecret=do-token-secret
    ```
+
+### Helm Repo Hosting (`charts.douz.io`)
+
+This repository is configured to publish Helm charts from `charts/` to GitHub Pages using `helm/chart-releaser-action`, with the chart repository URL set to `https://charts.douz.io`.
+
+One-time GitHub and DNS setup:
+
+1. In GitHub repo settings, enable **Pages** from branch `gh-pages` and folder `/ (root)`.
+2. In Pages custom domain, set `charts.douz.io` and enable **Enforce HTTPS**.
+3. In your DNS provider for `douz.io`, add:
+   - `CNAME` record for host `charts` pointing to `douz.github.io`.
 
 ### Operator Logs
 
