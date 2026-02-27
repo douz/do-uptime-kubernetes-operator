@@ -17,7 +17,7 @@ spec:
       serviceAccountName: {{ include "do-uptime-operator.serviceAccountName" . }}
       containers:
         - name: operator
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - kopf

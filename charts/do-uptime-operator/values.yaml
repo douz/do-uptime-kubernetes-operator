@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/douz/do-uptime-kubernetes-operator
-  tag: latest
+  tag: ""
   pullPolicy: IfNotPresent
 
 nameOverride: ""
