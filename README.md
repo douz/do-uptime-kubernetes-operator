@@ -132,19 +132,18 @@ Contributions are welcome! Feel free to open issues or submit pull requests. Ple
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-## Release Process
+## Publish Process
 
-1. Update `CHANGELOG.md` under `[Unreleased]`.
-2. Create and push a version tag:
+This repository publishes artifacts from GitHub Actions on pushes to `main`:
 
-```bash
-git tag vX.Y.Z
-git push origin vX.Y.Z
-```
+- Docker image publishing: `.github/workflows/build-push-image.yml`
+  - Builds and pushes `ghcr.io/douz/do-uptime-kubernetes-operator`
+  - Publishes `latest` and commit-SHA tags
+- Helm chart publishing: `.github/workflows/helm-release.yml`
+  - Packages charts under `charts/`
+  - Publishes chart artifacts/index to `https://charts.douz.io` via `douz/helm-charts`
 
-3. GitHub Actions will:
-   - create a GitHub Release with generated notes (`.github/workflows/release.yml`)
-   - publish Helm chart updates (`.github/workflows/helm-release.yml`)
+No tag-triggered GitHub Release automation is required for image/chart publishing.
 
 ## Project Ownership and Support
 

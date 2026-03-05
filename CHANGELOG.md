@@ -11,5 +11,5 @@ The format is based on Keep a Changelog.
 ### Added
 - Initial public open-source baseline for the DigitalOcean Uptime Monitor Operator.
 - Governance and community health files (`CONTRIBUTING`, `CODE_OF_CONDUCT`, `SECURITY`, `SUPPORT`, `MAINTAINERS`).
-- GitHub issue templates, PR template, CODEOWNERS, Dependabot config, and release notes categories.
+- GitHub issue templates, PR template, CODEOWNERS, and Dependabot config.
 - GitHub Pages landing site at `do-uptime-operator.douz.io`.
