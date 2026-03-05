@@ -15,7 +15,11 @@ The format is based on Keep a Changelog.
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-03-05
+## [2026-03-05]
+
+### Metadata
+- Chart version: `0.1.1`
+- Chart appVersion (image trace): `3a61d10a4cbf85e4f235d6762eb1fae0f8ba42d6`
 
 ### Added
 - Initial public open-source baseline for the DigitalOcean Uptime Monitor Operator.
