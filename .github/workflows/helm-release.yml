@@ -22,7 +22,7 @@ jobs:
       PUBLISH_TOKEN: ${{ secrets.HELM_REPO_TOKEN || secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout source repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -42,7 +42,7 @@ jobs:
           ls -lah .chart-packages
 
       - name: Checkout central Helm repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ env.TARGET_REPO }}
           ref: ${{ env.TARGET_BRANCH }}
