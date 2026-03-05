@@ -70,8 +70,11 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
-/site
+# mkdocs documentation output (keep landing page source tracked)
+/site/*
+!/site/index.html
+!/site/CNAME
+!/site/.nojekyll
 
 # mypy
 .mypy_cache/

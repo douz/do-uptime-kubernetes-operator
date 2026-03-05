@@ -1,6 +1,19 @@
 # DigitalOcean Uptime Monitor Operator
 
+[![Tests](https://github.com/douz/do-uptime-kubernetes-operator/actions/workflows/tests.yml/badge.svg)](https://github.com/douz/do-uptime-kubernetes-operator/actions/workflows/tests.yml)
+[![Helm Lint](https://github.com/douz/do-uptime-kubernetes-operator/actions/workflows/helm-lint.yml/badge.svg)](https://github.com/douz/do-uptime-kubernetes-operator/actions/workflows/helm-lint.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 This Kubernetes Operator automates the creation, update, and deletion of [DigitalOcean Uptime Monitors](https://docs.digitalocean.com/products/monitoring/) and related alerts based on Ingress annotations. The Operator creates a Custom Resource of kind `DoMonitor`, which is the single source of truth and is in charge of creating DigitalOcean resources (monitors and alerts).
+
+## Quick Links
+
+- [Documentation](docs/index.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
+- [Support](SUPPORT.md)
+- [Maintainers](MAINTAINERS.md)
+- [Changelog](CHANGELOG.md)
 
 ## Installation
 
@@ -118,6 +131,36 @@ Contributions are welcome! Feel free to open issues or submit pull requests. Ple
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
+
+## Release Process
+
+1. Update `CHANGELOG.md` under `[Unreleased]`.
+2. Create and push a version tag:
+
+```bash
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+3. GitHub Actions will:
+   - create a GitHub Release with generated notes (`.github/workflows/release.yml`)
+   - publish Helm chart updates (`.github/workflows/helm-release.yml`)
+
+## Project Ownership and Support
+
+- Maintainer details: `MAINTAINERS.md`
+- Community support expectations: `SUPPORT.md`
+- Vulnerability reporting: `SECURITY.md`
+
+## Community and Governance
+
+This repository includes:
+
+- `LICENSE` (MIT)
+- `CONTRIBUTING.md`
+- `CODE_OF_CONDUCT.md`
+- `SECURITY.md`
+- GitHub issue templates and PR template under `.github/`
 
 ## License
 

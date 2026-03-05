@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DigitalOcean Uptime Monitor Operator</title>
+  <meta name="description" content="Kubernetes Operator for DigitalOcean Uptime Monitor checks and alerts from Ingress annotations or DoMonitor CRDs.">
+  <style>
+    :root {
+      --bg: #071226;
+      --panel: #0e1d36;
+      --panel-alt: #142a4d;
+      --text: #f5f7fb;
+      --muted: #bcc8dc;
+      --primary: #00b7ff;
+      --accent: #39d98a;
+      --border: #26466f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(57, 217, 138, 0.22), transparent 35%),
+        radial-gradient(circle at 82% 10%, rgba(0, 183, 255, 0.24), transparent 38%),
+        linear-gradient(160deg, #050d1d, #0a1b35 56%, #0d2243);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .wrap {
+      width: min(1080px, 92vw);
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 44px;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      background: rgba(14, 29, 54, 0.75);
+      color: var(--muted);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .hero {
+      display: grid;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5.4vw, 54px);
+      line-height: 1.05;
+      max-width: 15ch;
+    }
+
+    .lead {
+      color: var(--muted);
+      margin: 0;
+      max-width: 68ch;
+      font-size: clamp(16px, 2vw, 20px);
+    }
+
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--primary), #32d6ff);
+      color: #032038;
+    }
+
+    .btn-secondary {
+      border-color: var(--border);
+      color: var(--text);
+      background: rgba(14, 29, 54, 0.65);
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      margin: 30px 0;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: linear-gradient(160deg, rgba(14, 29, 54, 0.85), rgba(20, 42, 77, 0.8));
+      padding: 18px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .section-title {
+      margin: 38px 0 12px;
+      font-size: 22px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #09162b;
+      color: #d8ecff;
+      overflow: auto;
+      font-size: 13px;
+    }
+
+    code {
+      font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+    }
+
+    footer {
+      margin-top: 46px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      font-size: 14px;
+    }
+
+    a { color: #7be0ff; }
+
+    @media (max-width: 560px) {
+      header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">do-uptime-kubernetes-operator</div>
+      <a class="pill" href="https://github.com/douz/do-uptime-kubernetes-operator">GitHub Repository</a>
+    </header>
+
+    <section class="hero">
+      <h1>DigitalOcean Uptime Monitoring, Automated from Kubernetes.</h1>
+      <p class="lead">
+        This operator watches your cluster and keeps DigitalOcean Uptime checks and alert policies in sync using Ingress annotations or `DoMonitor` CRDs.
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://github.com/douz/do-uptime-kubernetes-operator#installation">Install with Helm</a>
+        <a class="btn btn-secondary" href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/README.md">Read Documentation</a>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h3>Ingress-Driven Monitoring</h3>
+        <p>Add `douz.io/do-monitor: "true"` to Ingress resources and let the operator provision checks and alerts automatically.</p>
+      </article>
+      <article class="card">
+        <h3>CRD-Based Control</h3>
+        <p>Use `DoMonitor` custom resources when you want explicit and versioned monitor configuration in Git.</p>
+      </article>
+      <article class="card">
+        <h3>Alert Channels</h3>
+        <p>Configure email and Slack notifications for down, latency, and SSL expiry events from one source of truth.</p>
+      </article>
+    </section>
+
+    <h2 class="section-title">Quick Install</h2>
+    <pre><code>helm repo add do-uptime-operator https://charts.douz.io
+helm repo update
+helm upgrade --install do-uptime-operator do-uptime-operator/do-uptime-operator \
+  --namespace kube-system \
+  --create-namespace \
+  --set digitalocean.createSecret=true \
+  --set digitalocean.token='&lt;DIGITALOCEAN_TOKEN&gt;'</code></pre>
+
+    <h2 class="section-title">Project Links</h2>
+    <ul>
+      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator">Source Code</a></li>
+      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/README.md">README</a></li>
+      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/CONTRIBUTING.md">Contributing</a></li>
+      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/SECURITY.md">Security Policy</a></li>
+      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/releases">Releases</a></li>
+    </ul>
+
+    <footer>
+      MIT License. Maintained by <a href="https://github.com/douz">@douz</a>.
+    </footer>
+  </div>
+</body>
+</html>
