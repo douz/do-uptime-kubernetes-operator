@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a problem in do-uptime-kubernetes-operator
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is happening?
+    validations:
+      required: true
+  - type: input
+    id: k8s_version
+    attributes:
+      label: Kubernetes version
+      placeholder: e.g. v1.31.0
+  - type: input
+    id: operator_version
+    attributes:
+      label: Operator version
+      placeholder: e.g. chart 0.1.1, image sha/tag
+  - type: dropdown
+    id: install_method
+    attributes:
+      label: Install method
+      options:
+        - Helm chart
+        - Manifests
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior / logs
+    validations:
+      required: true

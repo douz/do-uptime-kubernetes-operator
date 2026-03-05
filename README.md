@@ -1,6 +1,19 @@
 # DigitalOcean Uptime Monitor Operator
 
+[![Tests](https://github.com/douz/do-uptime-kubernetes-operator/actions/workflows/tests.yml/badge.svg)](https://github.com/douz/do-uptime-kubernetes-operator/actions/workflows/tests.yml)
+[![Helm Lint](https://github.com/douz/do-uptime-kubernetes-operator/actions/workflows/helm-lint.yml/badge.svg)](https://github.com/douz/do-uptime-kubernetes-operator/actions/workflows/helm-lint.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 This Kubernetes Operator automates the creation, update, and deletion of [DigitalOcean Uptime Monitors](https://docs.digitalocean.com/products/monitoring/) and related alerts based on Ingress annotations. The Operator creates a Custom Resource of kind `DoMonitor`, which is the single source of truth and is in charge of creating DigitalOcean resources (monitors and alerts).
+
+## Quick Links
+
+- [Documentation](docs/index.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
+- [Support](SUPPORT.md)
+- [Maintainers](MAINTAINERS.md)
+- [Changelog](CHANGELOG.md)
 
 ## Installation
 
@@ -118,6 +131,43 @@ Contributions are welcome! Feel free to open issues or submit pull requests. Ple
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
+
+## Publish Process
+
+This repository publishes artifacts from GitHub Actions on pushes to `main`:
+
+- Docker image publishing: `.github/workflows/build-push-image.yml`
+  - Builds and pushes `ghcr.io/douz/do-uptime-kubernetes-operator`
+  - Publishes `latest` and commit-SHA tags
+- Helm chart publishing: `.github/workflows/helm-release.yml`
+  - Packages charts under `charts/`
+  - Publishes chart artifacts/index to `https://charts.douz.io` via `douz/helm-charts`
+
+No tag-triggered GitHub Release automation is required for image/chart publishing.
+
+## Versioning and Traceability
+
+- Human-readable change tracking: `CHANGELOG.md`
+- Helm release/version source: `charts/do-uptime-operator/Chart.yaml` (`version`, `appVersion`)
+- Runtime artifact traceability:
+  - Container image tags include commit SHA
+  - Helm packages are published to `https://charts.douz.io`
+
+## Project Ownership and Support
+
+- Maintainer details: `MAINTAINERS.md`
+- Community support expectations: `SUPPORT.md`
+- Vulnerability reporting: `SECURITY.md`
+
+## Community and Governance
+
+This repository includes:
+
+- `LICENSE` (MIT)
+- `CONTRIBUTING.md`
+- `CODE_OF_CONDUCT.md`
+- `SECURITY.md`
+- GitHub issue templates and PR template under `.github/`
 
 ## License
 
