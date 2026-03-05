@@ -9,11 +9,9 @@
     :root {
       --bg: #071226;
       --panel: #0e1d36;
-      --panel-alt: #142a4d;
       --text: #f5f7fb;
       --muted: #bcc8dc;
       --primary: #00b7ff;
-      --accent: #39d98a;
       --border: #26466f;
     }
 
@@ -42,12 +40,49 @@
       justify-content: space-between;
       align-items: center;
       gap: 16px;
-      margin-bottom: 44px;
+      margin-bottom: 38px;
     }
 
     .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
       font-weight: 700;
       letter-spacing: 0.02em;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(125, 211, 252, 0.16), rgba(167, 243, 208, 0.16));
+      border: 1px solid rgba(125, 211, 252, 0.2);
+      color: #d8f3ff;
+    }
+
+    .brand-mark svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    a {
+      color: #7be0ff;
+      text-decoration: none;
+      transition: color 180ms ease, opacity 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: #d8f3ff;
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
     .pill {
@@ -57,26 +92,33 @@
       padding: 6px 12px;
       border-radius: 999px;
       font-size: 13px;
+    }
+
+    .pill:hover,
+    .pill:focus-visible {
+      border-color: rgba(125, 211, 252, 0.42);
+      background: rgba(18, 38, 66, 0.9);
       text-decoration: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     }
 
     .hero {
       display: grid;
       gap: 24px;
-      margin-bottom: 32px;
+      margin-bottom: 30px;
     }
 
     h1 {
       margin: 0;
       font-size: clamp(30px, 5.4vw, 54px);
       line-height: 1.05;
-      max-width: 15ch;
+      max-width: 16ch;
     }
 
     .lead {
       color: var(--muted);
       margin: 0;
-      max-width: 68ch;
+      max-width: 72ch;
       font-size: clamp(16px, 2vw, 20px);
     }
 
@@ -94,6 +136,13 @@
       padding: 12px 16px;
       font-weight: 700;
       border: 1px solid transparent;
+      transition: transform 160ms ease, border-color 160ms ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-2px);
+      text-decoration: none;
     }
 
     .btn-primary {
@@ -111,7 +160,7 @@
       display: grid;
       gap: 16px;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      margin: 30px 0;
+      margin: 28px 0;
     }
 
     .card {
@@ -119,6 +168,28 @@
       border-radius: 14px;
       background: linear-gradient(160deg, rgba(14, 29, 54, 0.85), rgba(20, 42, 77, 0.8));
       padding: 18px;
+    }
+
+    .feature-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 14px;
+      border-radius: 14px;
+      background: rgba(125, 211, 252, 0.1);
+      border: 1px solid rgba(125, 211, 252, 0.16);
+      color: #d8f3ff;
+    }
+
+    .feature-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .card h3 {
@@ -133,23 +204,98 @@
     }
 
     .section-title {
-      margin: 38px 0 12px;
+      margin: 36px 0 10px;
       font-size: 22px;
+    }
+
+    .section-copy {
+      margin: 0 0 14px;
+      color: var(--muted);
+      max-width: 80ch;
     }
 
     pre {
       margin: 0;
-      padding: 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #09162b;
-      color: #d8ecff;
-      overflow: auto;
-      font-size: 13px;
+      padding: 34px 18px 18px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(31, 40, 55, 0.98), rgba(17, 24, 39, 0.99));
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      color: #e5eefc;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 18px 40px rgba(0, 0, 0, 0.22);
+      overflow-x: auto;
+      position: relative;
     }
+
+    pre::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #fb7185;
+      box-shadow: 16px 0 0 #fbbf24, 32px 0 0 #4ade80;
+    }
+
+    pre code {
+      display: block;
+      white-space: pre;
+      line-height: 1.75;
+      font-size: 0.92rem;
+      font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+    }
+
+    .cmd { color: #7dd3fc; }
+    .arg { color: #e2e8f0; }
+    .flag { color: #f9a8d4; }
+    .url { color: #fcd34d; }
+    .path { color: #a7f3d0; }
+
+    ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 8px;
+      color: var(--muted);
+    }
+
+    .anno-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      background: rgba(10, 24, 44, 0.56);
+      border-radius: 12px;
+      overflow: hidden;
+      display: block;
+    }
+
+    .anno-table thead,
+    .anno-table tbody,
+    .anno-table tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    .anno-table th,
+    .anno-table td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    .anno-table th { color: #cfe7ff; }
+    .anno-table td { color: var(--muted); }
 
     code {
       font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+      color: #d7ecff;
     }
 
     footer {
@@ -160,7 +306,11 @@
       font-size: 14px;
     }
 
-    a { color: #7be0ff; }
+    @media (max-width: 760px) {
+      .anno-table {
+        overflow-x: auto;
+      }
+    }
 
     @media (max-width: 560px) {
       header { flex-direction: column; align-items: flex-start; }
@@ -170,8 +320,24 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="brand">do-uptime-kubernetes-operator</div>
-      <a class="pill" href="https://github.com/douz/do-uptime-kubernetes-operator">GitHub Repository</a>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2.8v3"></path>
+            <path d="M12 18.2v3"></path>
+            <path d="M2.8 12h3"></path>
+            <path d="M18.2 12h3"></path>
+            <path d="m5.6 5.6 2.2 2.2"></path>
+            <path d="m16.2 16.2 2.2 2.2"></path>
+            <path d="m18.4 5.6-2.2 2.2"></path>
+            <path d="m7.8 16.2-2.2 2.2"></path>
+            <circle cx="12" cy="12" r="8.6"></circle>
+          </svg>
+        </span>
+        <span>do-uptime-kubernetes-operator</span>
+      </div>
+      <a class="pill" href="https://github.com/douz/do-uptime-kubernetes-operator" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
     </header>
 
     <section class="hero">
@@ -180,46 +346,186 @@
         This operator watches your cluster and keeps DigitalOcean Uptime checks and alert policies in sync using Ingress annotations or `DoMonitor` CRDs.
       </p>
       <div class="cta">
-        <a class="btn btn-primary" href="https://github.com/douz/do-uptime-kubernetes-operator#installation">Install with Helm</a>
-        <a class="btn btn-secondary" href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/README.md">Read Documentation</a>
+        <a class="btn btn-primary" href="#installation">Install with Helm</a>
+        <a class="btn btn-secondary" href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/README.md" target="_blank" rel="noopener noreferrer">Read Documentation</a>
       </div>
     </section>
 
     <section class="grid">
       <article class="card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 8h8"></path>
+            <path d="M3 12h8"></path>
+            <path d="M3 16h8"></path>
+            <path d="m11 12 3-3"></path>
+            <path d="m11 12 3 3"></path>
+            <path d="M14 9v6"></path>
+            <rect x="15" y="8" width="6" height="8" rx="1.4"></rect>
+          </svg>
+        </div>
         <h3>Ingress-Driven Monitoring</h3>
-        <p>Add `douz.io/do-monitor: "true"` to Ingress resources and let the operator provision checks and alerts automatically.</p>
+        <p>Add <code>douz.io/do-monitor: "true"</code> to Ingress resources and let the operator provision checks and alerts automatically.</p>
       </article>
       <article class="card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.82-.33 1.7 1.7 0 0 0-1 1.54V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.54 1.7 1.7 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.54-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.54-1 1.7 1.7 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 8.95 4.6 1.7 1.7 0 0 0 10 3.06V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.54 1.7 1.7 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.64.27 1.06.9 1.06 1.6V11a2 2 0 1 1 0 4h-.09c-.7 0-1.33.42-1.6 1.06z"></path>
+          </svg>
+        </div>
         <h3>CRD-Based Control</h3>
-        <p>Use `DoMonitor` custom resources when you want explicit and versioned monitor configuration in Git.</p>
+        <p>Use <code>DoMonitor</code> custom resources when you want explicit and versioned monitor configuration in Git.</p>
       </article>
       <article class="card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M15 17h5l-1.5-2a2.5 2.5 0 0 1-.5-1.5V11a6 6 0 1 0-12 0v2.5c0 .54-.17 1.07-.5 1.5L4 17h5"></path>
+            <path d="M10 19a2 2 0 0 0 4 0"></path>
+          </svg>
+        </div>
         <h3>Alert Channels</h3>
         <p>Configure email and Slack notifications for down, latency, and SSL expiry events from one source of truth.</p>
       </article>
     </section>
 
-    <h2 class="section-title">Quick Install</h2>
-    <pre><code>helm repo add do-uptime-operator https://charts.douz.io
-helm repo update
-helm upgrade --install do-uptime-operator do-uptime-operator/do-uptime-operator \
-  --namespace kube-system \
-  --create-namespace \
-  --set digitalocean.createSecret=true \
-  --set digitalocean.token='&lt;DIGITALOCEAN_TOKEN&gt;'</code></pre>
+    <h2 id="installation" class="section-title">Installation</h2>
+    <p class="section-copy">Install from the public chart repository and either create a new DigitalOcean token secret from Helm values or reference an existing one.</p>
+    <pre><code><span class="cmd">helm</span> <span class="arg">repo</span> <span class="arg">add</span> <span class="arg">do-uptime-operator</span> <span class="url">https://charts.douz.io</span>
+<span class="cmd">helm</span> <span class="arg">repo</span> <span class="arg">update</span>
+<span class="cmd">helm</span> <span class="arg">upgrade</span> <span class="arg">--install</span> <span class="arg">do-uptime-operator</span> <span class="arg">do-uptime-operator/do-uptime-operator</span> \
+  <span class="arg">--namespace</span> <span class="arg">kube-system</span> \
+  <span class="arg">--create-namespace</span> \
+  <span class="arg">--set</span> <span class="arg">digitalocean.createSecret=true</span> \
+  <span class="arg">--set</span> <span class="arg">digitalocean.token='&lt;DIGITALOCEAN_TOKEN&gt;'</span></code></pre>
+
+    <p class="section-copy" style="margin-top:12px;">Use an existing secret:</p>
+    <pre><code><span class="cmd">helm</span> <span class="arg">upgrade</span> <span class="arg">--install</span> <span class="arg">do-uptime-operator</span> <span class="arg">do-uptime-operator/do-uptime-operator</span> \
+  <span class="arg">--namespace</span> <span class="arg">kube-system</span> \
+  <span class="arg">--create-namespace</span> \
+  <span class="arg">--set</span> <span class="arg">digitalocean.createSecret=false</span> \
+  <span class="arg">--set</span> <span class="arg">digitalocean.existingSecret=do-token-secret</span></code></pre>
+
+    <h2 class="section-title">Usage</h2>
+    <p class="section-copy">The operator supports two flows:</p>
+    <ul>
+      <li>Ingress annotations (<code>douz.io/do-monitor: "true"</code>) for automatic reconciliation.</li>
+      <li><code>DoMonitor</code> resources for explicit, Git-managed monitor definitions.</li>
+    </ul>
+
+    <p class="section-copy" style="margin-top:14px;">Ingress flow summary:</p>
+    <ul>
+      <li>Reads all <code>douz.io/do-monitor-*</code> annotations.</li>
+      <li>Validates notification and alert settings.</li>
+      <li>Creates or updates one host-specific <code>DoMonitor</code> per Ingress host.</li>
+      <li>Reconciles DigitalOcean monitor + alert resources from that CR.</li>
+    </ul>
+
+    <h2 class="section-title">Ingress Example</h2>
+    <pre><code><span class="arg">apiVersion:</span> <span class="arg">networking.k8s.io/v1</span>
+<span class="arg">kind:</span> <span class="arg">Ingress</span>
+<span class="arg">metadata:</span>
+  <span class="arg">name:</span> <span class="arg">example-ingress</span>
+  <span class="arg">namespace:</span> <span class="arg">default</span>
+  <span class="arg">annotations:</span>
+    <span class="arg">douz.io/do-monitor:</span> <span class="arg">"true"</span>
+    <span class="arg">douz.io/do-monitor-email:</span> <span class="arg">"your-email@example.com"</span>
+    <span class="arg">douz.io/do-monitor-slack-webhook:</span> <span class="arg">"https://hooks.slack.com/services/T000/B000/XXXX"</span>
+    <span class="arg">douz.io/do-monitor-slack-channel:</span> <span class="arg">"#your-slack-channel"</span>
+    <span class="arg">douz.io/do-monitor-latency-threshold:</span> <span class="arg">"200"</span>
+    <span class="arg">douz.io/do-monitor-latency-period:</span> <span class="arg">"2m"</span>
+    <span class="arg">douz.io/do-monitor-ssl-expiry:</span> <span class="arg">"30"</span>
+<span class="arg">spec:</span>
+  <span class="arg">rules:</span>
+    - <span class="arg">host:</span> <span class="arg">example.com</span>
+      <span class="arg">http:</span>
+        <span class="arg">paths:</span>
+          - <span class="arg">path:</span> <span class="arg">/</span>
+            <span class="arg">pathType:</span> <span class="arg">Prefix</span>
+            <span class="arg">backend:</span>
+              <span class="arg">service:</span>
+                <span class="arg">name:</span> <span class="arg">example-service</span>
+                <span class="arg">port:</span>
+                  <span class="arg">number:</span> <span class="arg">80</span></code></pre>
+
+    <h2 class="section-title">DoMonitor Example</h2>
+    <pre><code><span class="arg">apiVersion:</span> <span class="arg">douz.io/v1</span>
+<span class="arg">kind:</span> <span class="arg">DoMonitor</span>
+<span class="arg">metadata:</span>
+  <span class="arg">name:</span> <span class="arg">ingress-test-default-domonitor</span>
+  <span class="arg">namespace:</span> <span class="arg">default</span>
+<span class="arg">spec:</span>
+  <span class="arg">ingressName:</span> <span class="arg">ingress-test</span>
+  <span class="arg">host:</span> <span class="arg">example.com</span>
+  <span class="arg">config:</span>
+    <span class="arg">email:</span> <span class="arg">your-email@example.com</span>
+    <span class="arg">emailAlert:</span> <span class="arg">true</span>
+    <span class="arg">slackWebhook:</span> <span class="arg">https://hooks.slack.com/services/...</span>
+    <span class="arg">slackChannel:</span> <span class="arg">#your-slack-channel</span>
+    <span class="arg">slackAlert:</span> <span class="arg">true</span>
+    <span class="arg">latencyThreshold:</span> <span class="arg">200</span>
+    <span class="arg">latencyPeriod:</span> <span class="arg">2m</span>
+    <span class="arg">sslExpiryPeriod:</span> <span class="arg">30</span></code></pre>
+
+    <h2 class="section-title">Ingress Annotation Reference</h2>
+    <table class="anno-table">
+      <thead>
+        <tr>
+          <th>Annotation</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>douz.io/do-monitor</code></td>
+          <td>Set to <code>"true"</code> to enable monitoring for an Ingress.</td>
+        </tr>
+        <tr>
+          <td><code>douz.io/do-monitor-email</code></td>
+          <td>Notification email (must be verified in DigitalOcean).</td>
+        </tr>
+        <tr>
+          <td><code>douz.io/do-monitor-slack-webhook</code></td>
+          <td>Slack webhook URL for alert delivery.</td>
+        </tr>
+        <tr>
+          <td><code>douz.io/do-monitor-slack-channel</code></td>
+          <td>Slack channel, for example <code>#alerts</code>.</td>
+        </tr>
+        <tr>
+          <td><code>douz.io/do-monitor-latency-threshold</code></td>
+          <td>Latency threshold in milliseconds.</td>
+        </tr>
+        <tr>
+          <td><code>douz.io/do-monitor-latency-period</code></td>
+          <td>Latency evaluation window (for example <code>2m</code>).</td>
+        </tr>
+        <tr>
+          <td><code>douz.io/do-monitor-ssl-expiry</code></td>
+          <td>Days before SSL cert expiry to trigger alert.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="section-copy" style="margin-top:14px;">Validation rules enforced by the operator:</p>
+    <ul>
+      <li>At least one channel: email or Slack webhook is required.</li>
+      <li>If Slack webhook is set, Slack channel is required.</li>
+      <li>If latency threshold is set, latency period is required.</li>
+      <li>Latency threshold and SSL expiry values must be integers.</li>
+    </ul>
 
     <h2 class="section-title">Project Links</h2>
     <ul>
-      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator">Source Code</a></li>
-      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/README.md">README</a></li>
-      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/CONTRIBUTING.md">Contributing</a></li>
-      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/SECURITY.md">Security Policy</a></li>
-      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/releases">Releases</a></li>
+      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator" target="_blank" rel="noopener noreferrer">Source Code</a></li>
+      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a></li>
+      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing</a></li>
+      <li><a href="https://github.com/douz/do-uptime-kubernetes-operator/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer">Security Policy</a></li>
+      <li><a href="https://charts.douz.io" target="_blank" rel="noopener noreferrer">Helm Repository</a></li>
     </ul>
 
     <footer>
-      MIT License. Maintained by <a href="https://github.com/douz">@douz</a>.
+      MIT License. Maintained by <a href="https://github.com/douz" target="_blank" rel="noopener noreferrer">@douz</a>.
     </footer>
   </div>
 </body>
