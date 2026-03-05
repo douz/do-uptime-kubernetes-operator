@@ -145,6 +145,14 @@ This repository publishes artifacts from GitHub Actions on pushes to `main`:
 
 No tag-triggered GitHub Release automation is required for image/chart publishing.
 
+## Versioning and Traceability
+
+- Human-readable change tracking: `CHANGELOG.md`
+- Helm release/version source: `charts/do-uptime-operator/Chart.yaml` (`version`, `appVersion`)
+- Runtime artifact traceability:
+  - Container image tags include commit SHA
+  - Helm packages are published to `https://charts.douz.io`
+
 ## Project Ownership and Support
 
 - Maintainer details: `MAINTAINERS.md`

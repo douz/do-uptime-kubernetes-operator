@@ -25,7 +25,9 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 1. Keep changes focused and small.
 2. Add or update tests when behavior changes.
 3. Update `README.md` and Helm chart docs if installation, configuration, or runtime behavior changes.
-4. Ensure CI is green before requesting review.
+4. Update `CHANGELOG.md` under `Unreleased` for user-visible changes.
+5. If chart/runtime behavior changes, update `charts/do-uptime-operator/Chart.yaml` (`version` and/or `appVersion`) in the same PR.
+6. Ensure CI is green before requesting review.
 
 ## Commit Messages
 
